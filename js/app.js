@@ -9,6 +9,7 @@ var PopularPlaces=function(item){
 }
 var ViewMode=function(){
 	var self=this;
+	initializeMap();
 	this.placeList=ko.observableArray([]);
 	// create an array to pass locations to google map 
 	var allLocations=[];
@@ -25,30 +26,48 @@ var ViewMode=function(){
         for (var i = 0; i < places.length; i++) {
             var item = places[i];
 			self.placeList.push( new PopularPlaces (item));
-			//allLocations.push(item.venue.location.formattedAddress[1]);
+			allLocations.push(item.venue.location.formattedAddress[1]);
         };
-		allLocations.push(places[0].venue.location.formattedAddress[1]);
-		initializeMap(allLocations);
+		//locationFinder(allLocations);
 
     }).error(function(e){
 		console.log('error');
     });
+	initializeMap();
+
 
 	
 };
+ // declares a global map variable
+var map;    
+
+/*
+locationFinder() returns an array of every location string from the JSONs
+written for popular places.
+*/
+function locationFinder(locations) {
+  
+  // initializes an empty array
+  var locations = [];
+
+  // adds the single location property from bio to the locations array
+  locations.push("Columbia Heights (btwn Remsen & Orange),Brooklyn, NY 11201,United States");
+
+  return locations;
+}
 /*
  initializeMap() is called when page is loaded.
 */
-function initializeMap(locations) {
+function initializeMap() {
     
-  var map;
+  var locations;  
   var mapOptions = {
-    disableDefaultUI: true
+     zoom: 15,
+     disableDefaultUI: true
   };
 
   // This next line makes `map` a new Google Map JavaScript Object and attaches it to
-  // <div id="map">
-  map = new google.maps.Map(document.querySelector('#map'), mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
 
   /*
@@ -61,8 +80,8 @@ function initializeMap(locations) {
     // The next lines save location data from the search result object to local variables
     var lat = placeData.geometry.location.lat();  // latitude from the place service
     var lon = placeData.geometry.location.lng();  // longitude from the place service
-    var name = placeData.formatted_address;   // name of the place from the place service
-    var bounds = window.mapBounds;            // current boundaries of the map window
+    var name = placeData.name;   // name of the place from the place service
+    var bounds = window.mapBounds;  // current boundaries of the map window
 
     // marker is an object with additional data about the pin for a single location
     var marker = new google.maps.Marker({
@@ -71,10 +90,11 @@ function initializeMap(locations) {
       title: name
     });
 	//create new content to style it
-    //var contentString = '<div id="content" style="border: 1px solid black; margin-top: 8px; background: orange; padding: 5px;  font-weight: bold;">'+
-       //  name+
-       //  '</div>';
+    var contentString = '<div id="content" style="border: 1px solid black; margin-top: 8px; background: orange; padding: 5px;  font-weight: bold;">'+
+        name+
+        '</div>';
 	   var contentString=name;
+	   
     // infoWindows are the little helper windows that open when you click
     // or hover over a pin on a map. They usually contain more information
     // about a location.
@@ -129,14 +149,16 @@ function initializeMap(locations) {
       service.textSearch(request, callback);
     }
   }
-
+  
   // Sets the boundaries of the map based on pin locations
   window.mapBounds = new google.maps.LatLngBounds();
+  // locations is an array of location strings returned from locationFinder()
+  locations = locationFinder();
 
-  // pinPoster(locations) creates pins on the map for each location in
+  //pinPoster(locations) creates pins on the map for each location in
   // the locations array
   pinPoster(locations);
   
 };
 
-ko.applyBindings(new ViewMode())
+ko.applyBindings(new ViewMode());
