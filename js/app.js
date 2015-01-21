@@ -7,12 +7,14 @@ var PopularPlaces=function(item){
 	this.imgSrc=ko.observable('img/434164568_fea0ad4013_z.jpg');
 	this.tips=ko.observable(item.tips[0].text)
 }
+
+
 var ViewMode=function(){
 	var self=this;
-	initializeMap();
 	this.placeList=ko.observableArray([]);
 	// create an array to pass locations to google map 
 	var allLocations=[];
+	
     // load popular places
     var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?ll=40.7,-74&section=topPicks'
                        + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN'
@@ -26,10 +28,9 @@ var ViewMode=function(){
         for (var i = 0; i < places.length; i++) {
             var item = places[i];
 			self.placeList.push( new PopularPlaces (item));
-			allLocations.push(item.venue.location.formattedAddress[1]);
-        };
-		//locationFinder(allLocations);
-
+			allLocations.push(item.venue.location.formattedAddress[0]+ ','+item.venue.location.formattedAddress[1]);
+        }
+		locationFinder(allLocations);
     }).error(function(e){
 		console.log('error');
     });
@@ -45,15 +46,9 @@ var map;
 locationFinder() returns an array of every location string from the JSONs
 written for popular places.
 */
-function locationFinder(locations) {
-  
-  // initializes an empty array
-  var locations = [];
+function locationFinder(allLocations) {
 
-  // adds the single location property from bio to the locations array
-  locations.push("Columbia Heights (btwn Remsen & Orange),Brooklyn, NY 11201,United States");
-
-  return locations;
+   return allLocations;
 }
 /*
  initializeMap() is called when page is loaded.
