@@ -1,6 +1,22 @@
 
 #map-canvas {
-    height: 600px;
+    height: 100%;
     width: 100%;
     padding-bottom: 5%;
+	padding-right: 20%;
+	padding-left: 10%;
+    display:block;
+    overflow:auto;
+}
+.list-group{
+  position:absolute;
+  top:0;
+  display:block;
+  overflow:auto;
+  margin-top:5px;
+  width:350px;
+  height: 820px;
+}
+.media{
+	background: #fff;
 }

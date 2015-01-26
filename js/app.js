@@ -47,6 +47,7 @@ var ViewModel = function() {
 
 		// This next line makes `map` a new Google Map JavaScript Object and attaches it to
 		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		$('#map-canvas').height($(window).height());
 
 
 		/*
