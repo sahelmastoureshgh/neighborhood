@@ -1,11 +1,13 @@
-var PopularPlaces=function(item){
-	this.name=ko.observable(item.venue.name);
-	this.category=ko.observable(item.venue.categories[0].name);
-	this.address=ko.observable(item.venue.location.formattedAddress);
-	this.phone=ko.observable(item.venue.contact.formattedPhone);
-	this.rating=ko.observable(item.venue.rating);
-	this.imgSrc=ko.observable('img/434164568_fea0ad4013_z.jpg');
-	this.tips=ko.observable(item.tips[0].text)
+var PopularPlaces = function(item) {
+	this.name = ko.observable(item.venue.name);
+	this.category = ko.observable(item.venue.categories[0].name);
+	this.address = ko.observable(item.venue.location.formattedAddress);
+	this.phone = ko.observable(item.venue.contact.formattedPhone);
+	this.rating = ko.observable(item.venue.rating);
+	this.imgSrc = ko.observable('img/434164568_fea0ad4013_z.jpg');
+	this.tips = ko.observable(item.tips[0].text);
+	this.preferredLoc=ko.observable("New york");
+	this.preferredExplore=ko.observable("New york");
 }
 
 
@@ -14,6 +16,10 @@ var ViewModel = function() {
 	this.placeList = ko.observableArray([]);
 	// create an array to pass places to google map 
 	var allPlaces = [];
+	// create an array to keep marker map locations
+	var Markers = [];
+	var latLoc;
+	var lonLoc;
 
 	// load popular places
 	var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?ll=40.7,-74&section=topPicks' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102';
@@ -40,7 +46,6 @@ var ViewModel = function() {
 	function initializeMap() {
 
 		var places;
-		var Markers=[];
 		var mapOptions = {
 			zoom: 15,
 			disableDefaultUI: true
@@ -63,11 +68,11 @@ var ViewModel = function() {
 			var lat = placeData.location.lat; // latitude from the place service
 			var lon = placeData.location.lng; // longitude from the place service
 			var name = placeData.name; // name of the place from the place service
-			var category = placeData.categories[0].name;    
+			var category = placeData.categories[0].name;
 			var address = placeData.location.formattedAddress;
 			var contact = placeData.contact.formattedPhone;
-			var rating =  placeData.rating;
-			var placeUrl= placeData.url;
+			var rating = placeData.rating;
+			var placeUrl = placeData.url;
 			var bounds = window.mapBounds; // current boundaries of the map window
 
 			// marker is an object with additional data about the pin for a single location
@@ -76,30 +81,11 @@ var ViewModel = function() {
 				position: new google.maps.LatLng(lat, lon),
 				title: name
 			});
-			
+
 			//save marker for each place in this array
 			Markers.push(marker);
 			//create new content to style it
-			var contentString = '<div class="venueInfowindow">' 
-							+ '<div class="venueName">'
-							+ '<a href ="' + placeUrl + '" target="_blank" >'
-							+ name
-							+ '</a>'
-			                + '</br>'
-							+ '<span class="venueRating badge">'
-							+ rating
-							+ '</span>'
-							+ '</div>'
-							+ '<div class="venueCategory"><span class="glyphicon glyphicon-tag"></span>'
-							+ category
-							+ '</div>'
-							+ '<div class="venueAddress"><span class="glyphicon glyphicon-home"></span>'
-							+ address
-							+ '</div>'
-							+ '<div class="venueContact"><span class="glyphicon glyphicon-earphone"></span>'
-							+ contact
-							+ '</div>'   						    						    						
-							+ '</div>';
+			var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '</br>' + '<span class="venueRating badge">' + rating + '</span>' + '</div>' + '<div class="venueCategory"><span class="glyphicon glyphicon-tag"></span>' + category + '</div>' + '<div class="venueAddress"><span class="glyphicon glyphicon-home"></span>' + address + '</div>' + '<div class="venueContact"><span class="glyphicon glyphicon-earphone"></span>' + contact + '</div>' + '</div>';
 
 			// infoWindows are the little helper windows that open when you click
 			// or hover over a pin on a map. They usually contain more information
@@ -140,48 +126,67 @@ var ViewModel = function() {
 
 				// the search request object
 				var request = {
-					query: Places[place].location.formattedAddress[0] + ',' + Places[place].location.formattedAddress[1] 
+					query: Places[place].location.formattedAddress[0] + ',' + Places[place].location.formattedAddress[1]
 				}
 
 				// Actually searches the Google Maps API for location data and runs the callback 
 				// function with the search results after each search.
 				service.textSearch(request, function(results, status) {
-			            if (status == google.maps.places.PlacesServiceStatus.OK) {
-							// call createMapMarker for places
-						    for (var i in Places) {
-						           createMapMarker(Places[i]);
-						     }
-			            }
+					if (status == google.maps.places.PlacesServiceStatus.OK) {
+						// call createMapMarker for places
+						for (var i in Places) {
+							createMapMarker(Places[i]);
+						}
 					}
-			   );
-		   }
+				});
+			}
 		}
 
 		// Sets the boundaries of the map based on pin locations
 		window.mapBounds = new google.maps.LatLngBounds();
 
 		//pinPoster(Places) creates pins on the map for each location in
-		// the Places array
+		//the Places array
 		pinPoster(allPlaces);
 
 	};
+	
+	/**
+	Find lat and long address
+	**/
+	self.FindLatAndLog=function(placeAddress){
+		var service = new google.maps.places.PlacesService(map);
+		// the search request object
+		var request = {
+			query: placeAddress
+		}
+
+		// Actually searches the Google Maps API for location data and runs the callback 
+		// function with the search results after each search.
+		service.textSearch(request, function(results, status) {
+			if (status == google.maps.places.PlacesServiceStatus.OK) {
+				self.latLoc=results[0].geometry.location.lat();
+				self.lonLoc=results[0].geometry.location.lng();
+
+			}
+		});
+		
+	}
 	/**
 	 When list item clicked call this function
-	 Look if lat and long of clicked item is equal to anyone in markers list
+	 Look if name of clicked item is equal to anyone in markers list
 	**/
-	self.focusMarker=function(venue){
-		var lat=venue.placeList.location.lat;
-		var lon=venue.placeList.location.lon;
-		var venuPosition= new google.maps.LatLng(lat, lon)
+	self.focusMarker = function(venue) {
+		var venueName = venue.name();
 		for (var i in Markers) {
-		      if (Markers[i].position == venuPosition) {
-		        google.maps.event.trigger(Markers[i], 'click');
-		        map.panTo(Markers[i].position);
-		      }
+			if (Markers[i].title == venueName) {
+				google.maps.event.trigger(Markers[i], 'click');
+				map.panTo(Markers[i].position);
+			}
 		}
 	}
 
 };
- // declares a global map variable
-var map;    
+// declares a global map variable
+var map;
 ko.applyBindings(new ViewModel());
