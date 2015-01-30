@@ -9,11 +9,20 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 <body>
-<div style="fixed-container">
+<div style="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
 			<div id="map-canvas"></div>
-			<div class="list-group" data-bind="foreach: placeList">
+			<form class="form-inline search-bar" role="search">
+			    <div class="form-group">
+			        <input data-bind="text: preferredExplore" type="search" class="form-control" placeholder="Pizza" >
+			    </div>
+			    <div class="form-group">
+			       <input data-bind="text: preferredLoc" type="search" class="form-control"  placeholder="New York, NY">
+			     </div>
+			    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+			</form>
+			<div class="list-group venu-group" data-bind="foreach: placeList">
 				<div class="media" data-bind="click: $root.focusMarker">
 					<a class="pull-left" href="#" target="_parent"><img alt="image" class="img-responsive" src="http://lorempixel.com/150/150/nature/4"></a>
 					<div class="media-body">

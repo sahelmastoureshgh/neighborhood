@@ -6,25 +6,30 @@ var PopularPlaces = function(item) {
 	this.rating = ko.observable(item.venue.rating);
 	this.imgSrc = ko.observable('img/434164568_fea0ad4013_z.jpg');
 	this.tips = ko.observable(item.tips[0].text);
-	this.preferredLoc=ko.observable("New york");
-	this.preferredExplore=ko.observable("New york");
+
 }
 
 
 var ViewModel = function() {
 	var self = this;
+	// create an observable array to keeo each popular place in it
 	this.placeList = ko.observableArray([]);
+	//prefered location for search to find places
+	this.preferredLoc = ko.observable("New York, NY");
+	//prefered type of location
+	this.preferredExplore = ko.observable("pizza");
 	// create an array to pass places to google map 
 	var allPlaces = [];
 	// create an array to keep marker map locations
 	var Markers = [];
-	var latLoc;
-	var lonLoc;
-
+	// near of place for api request
+	var placeNear = '&near=' + self.preferredLoc();
+	// query to find places
+	var query = '&query=' + self.preferredExplore();
 	// load popular places
-	var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?ll=40.7,-74&section=topPicks' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102';
+	var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102' + placeNear + query;
 
-
+	//Get json data from four sqaure API 
 	$.getJSON(foursqureUrl, function(data) {
 
 		var places = data.response.groups[0].items;
@@ -37,6 +42,7 @@ var ViewModel = function() {
 	}).error(function(e) {
 		console.log('error');
 	});
+
 
 
 	/*
@@ -111,8 +117,8 @@ var ViewModel = function() {
 
 
 		/*
-        pinPoster(Places) takes in the array of Places received from ajax foursquer 
-        and fires off Google place searches for each location
+          pinPoster(Places) takes in the array of Places received from ajax foursquer 
+          and fires off Google place searches for each location
         */
 
 		function pinPoster(Places) {
@@ -150,28 +156,8 @@ var ViewModel = function() {
 		pinPoster(allPlaces);
 
 	};
-	
-	/**
-	Find lat and long address
-	**/
-	self.FindLatAndLog=function(placeAddress){
-		var service = new google.maps.places.PlacesService(map);
-		// the search request object
-		var request = {
-			query: placeAddress
-		}
 
-		// Actually searches the Google Maps API for location data and runs the callback 
-		// function with the search results after each search.
-		service.textSearch(request, function(results, status) {
-			if (status == google.maps.places.PlacesServiceStatus.OK) {
-				self.latLoc=results[0].geometry.location.lat();
-				self.lonLoc=results[0].geometry.location.lng();
 
-			}
-		});
-		
-	}
 	/**
 	 When list item clicked call this function
 	 Look if name of clicked item is equal to anyone in markers list

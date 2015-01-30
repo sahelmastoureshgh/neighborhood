@@ -8,14 +8,14 @@
     display:block;
     overflow:auto;
 }
-.list-group{
+.venu-group{
   position:absolute;
-  top:0;
+  top:40px;
   display:block;
   overflow:auto;
-  margin-top:5px;
   width:350px;
   height: 820px;
+  z-index: 1;
 }
 .media{
 	background: #fff;
@@ -35,4 +35,12 @@
 
 .venueInfowindow .glyphicon{
   margin-right:5px;
+}
+.left-inner-addon {
+    position: relative;
+}
+.search-bar {
+    position: absolute;
+    top: 0px;
+    z-index: 1;
 }
