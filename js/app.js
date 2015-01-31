@@ -16,12 +16,12 @@ var ViewModel = function() {
 	this.preferredLoc = ko.observable("New York, NY");
 	//prefered type of location
 	this.preferredExplore = ko.observable("pizza");
-	searchPlaces();
+	self.searchPlaces;
 	
 	/**
 	 when search button is clicked call this function
 	**/
-	function searchPlaces() {
+	self.searchPlaces=function() {
 		// create an observable array to keeo each popular place in it
 		self.placeList = ko.observableArray([]);
 
@@ -109,9 +109,9 @@ var ViewModel = function() {
 
 
 	/*
-          pinPoster(Places) takes in the array of Places received from ajax foursquer 
-          and fires off Google place searches for each location
-        */
+      pinPoster(Places) takes in the array of Places received from ajax foursquer 
+      and fires off Google place searches for each location
+    */
 
 	function pinPoster(Places) {
 

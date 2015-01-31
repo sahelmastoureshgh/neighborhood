@@ -20,7 +20,7 @@
 			    <div class="form-group">
 			       <input data-bind="textInput: preferredLoc" type="search" class="form-control"  placeholder="New York, NY">
 			     </div>
-			    <button type="submit" data-bind="click: $root.searchPlaces" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+			    <button type="submit" data-bind="click:searchPlaces()" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 			</form>
 			<div class="list-group venu-group" data-bind="foreach: placeList">
 				<div class="media" data-bind="click: $root.focusMarker">
