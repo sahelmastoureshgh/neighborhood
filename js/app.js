@@ -6,156 +6,148 @@ var PopularPlaces = function(item) {
 	this.rating = ko.observable(item.venue.rating);
 	this.imgSrc = ko.observable('img/434164568_fea0ad4013_z.jpg');
 	this.tips = ko.observable(item.tips[0].text);
-
+	
 }
 
 
 var ViewModel = function() {
 	var self = this;
-	// create an observable array to keeo each popular place in it
-	this.placeList = ko.observableArray([]);
 	//prefered location for search to find places
 	this.preferredLoc = ko.observable("New York, NY");
 	//prefered type of location
 	this.preferredExplore = ko.observable("pizza");
-	// create an array to pass places to google map 
-	var allPlaces = [];
-	// create an array to keep marker map locations
-	var Markers = [];
-	// near of place for api request
-	var placeNear = '&near=' + self.preferredLoc();
-	// query to find places
-	var query = '&query=' + self.preferredExplore();
-	// load popular places
-	var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102' + placeNear + query;
+	searchPlaces();
+	
+	/**
+	 when search button is clicked call this function
+	**/
+	function searchPlaces() {
+		// create an observable array to keeo each popular place in it
+		self.placeList = ko.observableArray([]);
 
-	//Get json data from four sqaure API 
-	$.getJSON(foursqureUrl, function(data) {
+		//create an array to pass places to google map 
+		var allPlaces = [];
 
-		var places = data.response.groups[0].items;
-		for (var i = 0; i < places.length; i++) {
-			var item = places[i];
-			self.placeList.push(new PopularPlaces(item));
-			allPlaces.push(item.venue);
-		}
-		initializeMap();
-	}).error(function(e) {
-		console.log('error');
-	});
+		// near of place for api request
+		var placeNear = '&near=' + self.preferredLoc();
+		// query to find places
+		var query = '&query=' + self.preferredExplore();
+		// load popular places
+		var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102' + placeNear + query;
+
+		//Get json data from four sqaure API 
+		$.getJSON(foursqureUrl, function(data) {
+
+			var places = data.response.groups[0].items;
+			for (var i = 0; i < places.length; i++) {
+				var item = places[i];
+				self.placeList.push(new PopularPlaces(item));
+				allPlaces.push(item.venue);
+			}
+			pinPoster(allPlaces);
+		}).error(function(e) {
+			console.log('error');
+		});
+	}
+
+
 
 
 
 	/*
-     initializeMap() 
+      createMapMarker(placeData) reads Places information to create map pins.
+      placeData is the object returned from search results containing information
+      about a single location from fourSquare Api.
     */
 
-	function initializeMap() {
+	function createMapMarker(placeData) {
+       
+		// The next lines save location data from the search result object to local variables
+		var lat = placeData.location.lat; // latitude from the place service
+		var lon = placeData.location.lng; // longitude from the place service
+		var name = placeData.name; // name of the place from the place service
+		var category = placeData.categories[0].name;
+		var address = placeData.location.formattedAddress;
+		var contact = placeData.contact.formattedPhone;
+		var rating = placeData.rating;
+		var placeUrl = placeData.url;
+		var bounds = window.mapBounds; // current boundaries of the map window
 
-		var places;
-		var mapOptions = {
-			zoom: 15,
-			disableDefaultUI: true
-		};
+		// marker is an object with additional data about the pin for a single location
+		var marker = new google.maps.Marker({
+			map: map,
+			position: new google.maps.LatLng(lat, lon),
+			title: name
+		});
 
-		// This next line makes `map` a new Google Map JavaScript Object and attaches it to
-		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-		$('#map-canvas').height($(window).height());
+		//save marker for each place in this array
+		Markers.push(marker);
+		//create new content to style it
+		var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '</br>' + '<span class="venueRating badge">' + rating + '</span>' + '</div>' + '<div class="venueCategory"><span class="glyphicon glyphicon-tag"></span>' + category + '</div>' + '<div class="venueAddress"><span class="glyphicon glyphicon-home"></span>' + address + '</div>' + '<div class="venueContact"><span class="glyphicon glyphicon-earphone"></span>' + contact + '</div>' + '</div>';
 
-
-		/*
-         createMapMarker(placeData) reads Places information to create map pins.
-         placeData is the object returned from search results containing information
-         about a single location from fourSquare Api.
-        */
-
-		function createMapMarker(placeData) {
-
-			// The next lines save location data from the search result object to local variables
-			var lat = placeData.location.lat; // latitude from the place service
-			var lon = placeData.location.lng; // longitude from the place service
-			var name = placeData.name; // name of the place from the place service
-			var category = placeData.categories[0].name;
-			var address = placeData.location.formattedAddress;
-			var contact = placeData.contact.formattedPhone;
-			var rating = placeData.rating;
-			var placeUrl = placeData.url;
-			var bounds = window.mapBounds; // current boundaries of the map window
-
-			// marker is an object with additional data about the pin for a single location
-			var marker = new google.maps.Marker({
-				map: map,
-				position: new google.maps.LatLng(lat, lon),
-				title: name
-			});
-
-			//save marker for each place in this array
-			Markers.push(marker);
-			//create new content to style it
-			var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '</br>' + '<span class="venueRating badge">' + rating + '</span>' + '</div>' + '<div class="venueCategory"><span class="glyphicon glyphicon-tag"></span>' + category + '</div>' + '<div class="venueAddress"><span class="glyphicon glyphicon-home"></span>' + address + '</div>' + '<div class="venueContact"><span class="glyphicon glyphicon-earphone"></span>' + contact + '</div>' + '</div>';
-
-			// infoWindows are the little helper windows that open when you click
-			// or hover over a pin on a map. They usually contain more information
-			// about a location.
-			var infoWindow = new google.maps.InfoWindow({
-				content: contentString
-			});
+		// infoWindows are the little helper windows that open when you click
+		// or hover over a pin on a map. They usually contain more information
+		// about a location.
+		var infoWindow = new google.maps.InfoWindow({
+			content: contentString
+		});
 
 
-			google.maps.event.addListener(marker, 'click', function() {
-				infoWindow.open(map, marker);
-			});
+		google.maps.event.addListener(marker, 'click', function() {
+			infoWindow.open(map, marker);
+		});
 
-			// this is where the pin actually gets added to the map.
-			// bounds.extend() takes in a map location object
-			bounds.extend(new google.maps.LatLng(lat, lon));
-			// fit the map to the new marker
-			map.fitBounds(bounds);
-			// center the map
-			map.setCenter(bounds.getCenter());
-		}
+		// this is where the pin actually gets added to the map.
+		// bounds.extend() takes in a map location object
+		bounds.extend(new google.maps.LatLng(lat, lon));
+		// fit the map to the new marker
+		map.fitBounds(bounds);
+		// center the map
+		map.setCenter(bounds.getCenter());
+	}
 
 
 
-		/*
+	/*
           pinPoster(Places) takes in the array of Places received from ajax foursquer 
           and fires off Google place searches for each location
         */
 
-		function pinPoster(Places) {
+	function pinPoster(Places) {
 
-			// creates a Google place search service object. PlacesService does the work of
-			// actually searching for location data.
-			var service = new google.maps.places.PlacesService(map);
+		// creates a Google place search service object. PlacesService does the work of
+		// actually searching for location data.
+		var service = new google.maps.places.PlacesService(map);
 
-			// Iterates through the array of Places, creates a search object for each location
-			for (place in Places) {
+		// Iterates through the array of Places, creates a search object for each location
+		for (place in Places) {
 
-				// the search request object
-				var request = {
-					query: Places[place].location.formattedAddress[0] + ',' + Places[place].location.formattedAddress[1]
-				}
-
-				// Actually searches the Google Maps API for location data and runs the callback 
-				// function with the search results after each search.
-				service.textSearch(request, function(results, status) {
-					if (status == google.maps.places.PlacesServiceStatus.OK) {
-						// call createMapMarker for places
-						for (var i in Places) {
-							createMapMarker(Places[i]);
-						}
-					}
-				});
+			// the search request object
+			var request = {
+				query: Places[place].location.formattedAddress[0] + ',' + Places[place].location.formattedAddress[1]
 			}
+
+			// Actually searches the Google Maps API for location data and runs the callback 
+			// function with the search results after each search.
+			service.textSearch(request, function(results, status) {
+				if (status == google.maps.places.PlacesServiceStatus.OK) {
+					// call createMapMarker for places
+					for (var i in Places) {
+						createMapMarker(Places[i]);
+					}
+				}
+			});
 		}
+	}
 
-		// Sets the boundaries of the map based on pin locations
-		window.mapBounds = new google.maps.LatLngBounds();
+	// Sets the boundaries of the map based on pin locations
+	//window.mapBounds = new google.maps.LatLngBounds();
 
-		//pinPoster(Places) creates pins on the map for each location in
-		//the Places array
-		pinPoster(allPlaces);
+	//pinPoster(Places) creates pins on the map for each location in
+	//the Places array
+	//pinPoster(allPlaces);
 
-	};
+
 
 
 	/**
@@ -173,6 +165,32 @@ var ViewModel = function() {
 	}
 
 };
+/*
+ initializeMap() 
+*/
+
+function initializeMap() {
+
+	var places;
+	var mapOptions = {
+		zoom: 15,
+		disableDefaultUI: true
+	};
+
+	// This next line makes `map` a new Google Map JavaScript Object and attaches it to
+	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	$('#map-canvas').height($(window).height());
+}
+
 // declares a global map variable
 var map;
-ko.applyBindings(new ViewModel());
+// create an array to keep marker map locations
+var Markers = [];
+// Then do something like this
+document.addEventListener('DOMContentLoaded',function() {
+   // Use DOMContentLoaded to make sure the #map-canvas has been loaded before initializing the Google Map
+   initializeMap();
+   // Sets the boundaries of the map based on pin locations
+   window.mapBounds = new google.maps.LatLngBounds();
+   ko.applyBindings(new ViewModel());
+});

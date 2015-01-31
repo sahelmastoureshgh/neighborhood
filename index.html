@@ -15,12 +15,12 @@
 			<div id="map-canvas"></div>
 			<form class="form-inline search-bar" role="search">
 			    <div class="form-group">
-			        <input data-bind="text: preferredExplore" type="search" class="form-control" placeholder="Pizza" >
+			        <input data-bind="textInput: preferredExplore" type="search" class="form-control" placeholder="Pizza" >
 			    </div>
 			    <div class="form-group">
-			       <input data-bind="text: preferredLoc" type="search" class="form-control"  placeholder="New York, NY">
+			       <input data-bind="textInput: preferredLoc" type="search" class="form-control"  placeholder="New York, NY">
 			     </div>
-			    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+			    <button type="submit" data-bind="click: $root.searchPlaces" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 			</form>
 			<div class="list-group venu-group" data-bind="foreach: placeList">
 				<div class="media" data-bind="click: $root.focusMarker">
