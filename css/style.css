@@ -10,11 +10,12 @@
 }
 .venu-group{
   position:absolute;
-  top:40px;
+  top:50px;
   display:block;
   overflow:auto;
   width:350px;
   height: 820px;
+  left: 40px;
   z-index: 1;
 }
 .media{
@@ -41,6 +42,7 @@
 }
 .search-bar {
     position: absolute;
-    top: 0px;
+    top: 10px;
     z-index: 1;
+	left: 40px;
 }
