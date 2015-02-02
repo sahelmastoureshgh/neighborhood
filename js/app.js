@@ -5,8 +5,6 @@ var PopularPlaces = function(item) {
 	this.phone = ko.observable(item.venue.contact.formattedPhone);
 	this.rating = ko.observable(item.venue.rating);
 	this.imgSrc = ko.observable('https://irs0.4sqi.net/img/general/100x100'+item.venue.photos.groups[0].items[0].suffix);
-	this.tips = ko.observable(item.tips[0].text);
-
 }
 
 
@@ -35,6 +33,7 @@ var ViewModel = function() {
 			Markers[i].setMap(null);
 			i++;
 		}
+		Markers.lenght=0;
 		// empty out popular list arry for each search
 		self.placeList([]);
 
@@ -49,10 +48,23 @@ var ViewModel = function() {
 		$.getJSON(foursqureUrl, function(data) {
 
 			var places = data.response.groups[0].items;
+	        // set bounds according to suggested bounds from foursquare 
+			var Bounds = data.response.suggestedBounds;
+			var bounds = new google.maps.LatLngBounds(
+					new google.maps.LatLng(Bounds.sw.lat, Bounds.sw.lng),
+					new google.maps.LatLng(Bounds.ne.lat, Bounds.ne.lng));
+			map.fitBounds(bounds);
+			// center the map
+			map.setCenter(bounds.getCenter());
+			
 			for (var i = 0; i < places.length; i++) {
 				var item = places[i];
-				self.placeList.push(new PopularPlaces(item));
-				allPlaces.push(item.venue);
+				// just add those items in list which has picture
+				if (item.venue.photos.groups.length != 0) {
+	               self.placeList.push(new PopularPlaces(item));
+	               allPlaces.push(item.venue);
+                };
+
 			}
 			pinPoster(allPlaces);
 		}).error(function(e) {
@@ -79,7 +91,6 @@ var ViewModel = function() {
 		var contact = placeData.contact.formattedPhone;
 		var rating = placeData.rating;
 		var placeUrl = placeData.url;
-		var bounds = window.mapBounds; // current boundaries of the map window
 
 		// marker is an object with additional data about the pin for a single location
 		var marker = new google.maps.Marker({
@@ -105,13 +116,7 @@ var ViewModel = function() {
 			infoWindow.open(map, marker);
 		});
 
-		// this is where the pin actually gets added to the map.
-		// bounds.extend() takes in a map location object
-		bounds.extend(new google.maps.LatLng(lat, lon));
-		// fit the map to the new marker
-		map.fitBounds(bounds);
-		// center the map
-		map.setCenter(bounds.getCenter());
+
 	}
 
 
@@ -167,8 +172,6 @@ var map;
 $(function() {
 
 	initializeMap();
-	// Sets the boundaries of the map based on pin locations
-	window.mapBounds = new google.maps.LatLngBounds();
 	ko.applyBindings(new ViewModel());
 
 });
