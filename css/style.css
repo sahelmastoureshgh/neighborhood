@@ -8,6 +8,7 @@
     display:block;
     overflow:auto;
 }
+
 .venu-group{
   position:absolute;
   top:50px;
@@ -22,7 +23,7 @@
 	background: #fff;
 }
 .venueInfowindow{
-  max-width: 200px;
+  max-width: 300px;
 }
 
 .venueInfowindow .venueName{
@@ -30,13 +31,11 @@
   font-weight: 400;
 }
 
-.venueInfowindow .venueRating{
-  margin-left:5px;
+ .venueRating{
+  float:left;
+  clear:right;
 }
 
-.venueInfowindow .glyphicon{
-  margin-right:5px;
-}
 .left-inner-addon {
     position: relative;
 }
@@ -45,4 +44,7 @@
     top: 10px;
     z-index: 1;
 	left: 40px;
+}
+.bgimg{
+	max-width : none !important;
 }

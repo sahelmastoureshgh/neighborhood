@@ -4,7 +4,7 @@ var PopularPlaces = function(item) {
 	this.address = ko.observable(item.venue.location.formattedAddress);
 	this.phone = ko.observable(item.venue.contact.formattedPhone);
 	this.rating = ko.observable(item.venue.rating);
-	this.imgSrc = ko.observable('https://irs0.4sqi.net/img/general/100x100'+item.venue.photos.groups[0].items[0].suffix);
+	this.imgSrc = ko.observable('https://irs0.4sqi.net/img/general/100x100' + item.venue.photos.groups[0].items[0].suffix);
 }
 
 
@@ -33,7 +33,7 @@ var ViewModel = function() {
 			Markers[i].setMap(null);
 			i++;
 		}
-		Markers.lenght=0;
+		Markers.lenght = 0;
 		// empty out popular list arry for each search
 		self.placeList([]);
 
@@ -48,24 +48,28 @@ var ViewModel = function() {
 		$.getJSON(foursqureUrl, function(data) {
 
 			var places = data.response.groups[0].items;
-	        // set bounds according to suggested bounds from foursquare 
+			// set bounds according to suggested bounds from foursquare 
 			var Bounds = data.response.suggestedBounds;
 			var bounds = new google.maps.LatLngBounds(
-					new google.maps.LatLng(Bounds.sw.lat, Bounds.sw.lng),
-					new google.maps.LatLng(Bounds.ne.lat, Bounds.ne.lng));
+				new google.maps.LatLng(Bounds.sw.lat, Bounds.sw.lng),
+				new google.maps.LatLng(Bounds.ne.lat, Bounds.ne.lng));
 			map.fitBounds(bounds);
 			// center the map
 			map.setCenter(bounds.getCenter());
-			
+
 			for (var i = 0; i < places.length; i++) {
 				var item = places[i];
 				// just add those items in list which has picture
 				if (item.venue.photos.groups.length != 0) {
-	               self.placeList.push(new PopularPlaces(item));
-	               allPlaces.push(item.venue);
-                };
-
+					self.placeList.push(new PopularPlaces(item));
+					allPlaces.push(item.venue);
+				};
 			}
+			// sort an array based on ranking
+			self.placeList.sort(function(left, right) {
+				return left.rating == right.rating ? 0 : (left.rating > right.rating ? -1 : 1)
+			});
+			// create marker for all places on map
 			pinPoster(allPlaces);
 		}).error(function(e) {
 			console.log('error');
@@ -87,7 +91,7 @@ var ViewModel = function() {
 		var lon = placeData.location.lng; // longitude from the place service
 		var name = placeData.name; // name of the place from the place service
 		var category = placeData.categories[0].name;
-		var address = placeData.location.formattedAddress;
+		var address = placeData.location.address + ',' + placeData.location.city + ',' + placeData.location.country;
 		var contact = placeData.contact.formattedPhone;
 		var rating = placeData.rating;
 		var placeUrl = placeData.url;
@@ -101,8 +105,11 @@ var ViewModel = function() {
 
 		//save marker for each place in this array
 		Markers.push(marker);
+
+		// load streetview
+		var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x110&location=' + address + '';
 		//create new content to style it
-		var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '</br>' + '<span class="venueRating badge">' + rating + '</span>' + '</div>' + '<div class="venueCategory"><span class="glyphicon glyphicon-tag"></span>' + category + '</div>' + '<div class="venueAddress"><span class="glyphicon glyphicon-home"></span>' + address + '</div>' + '<div class="venueContact"><span class="glyphicon glyphicon-earphone"></span>' + contact + '</div>' + '</div>';
+		var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '<span class="venueRating label-info badge">' + rating + '<sub> /10</sub>' + '</span>' + '</div>' + '<div class="venueContact"><span class="icon-phone"></span>' + contact + '</div>' + '<img class="bgimg" src="' + streetviewUrl + '">' + '</div>';
 
 		// infoWindows are the little helper windows that open when you click
 		// or hover over a pin on a map. They usually contain more information
