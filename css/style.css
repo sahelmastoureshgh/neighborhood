@@ -31,9 +31,10 @@
   font-weight: 400;
 }
 
- .venueRating{
+.venueRating{
   float:left;
   clear:right;
+  background-color: #338599;
 }
 
 .left-inner-addon {
@@ -46,5 +47,5 @@
 	left: 40px;
 }
 .bgimg{
-	max-width : none !important;
+	max-width: 250px !important;
 }

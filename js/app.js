@@ -67,7 +67,7 @@ var ViewModel = function() {
 			}
 			// sort an array based on ranking
 			self.placeList.sort(function(left, right) {
-				return left.rating == right.rating ? 0 : (left.rating > right.rating ? -1 : 1)
+				return left.rating() == right.rating() ? 0 : (left.rating() > right.rating() ? -1 : 1)
 			});
 			// create marker for all places on map
 			pinPoster(allPlaces);
