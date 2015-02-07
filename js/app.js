@@ -1,3 +1,6 @@
+/**
+ Model for places
+**/
 var PopularPlaces = function(item) {
 	this.name = ko.observable(item.venue.name);
 	this.category = ko.observable(item.venue.categories[0].name);
@@ -72,17 +75,18 @@ var ViewModel = function() {
 			// create marker for all places on map
 			pinPoster(allPlaces);
 		}).error(function(e) {
+			$('.venu-group').html('<h4>There is problem to retrieve data</br>Please try again later</h4>')
 			console.log('error');
 		});
 	}
 	self.searchPlaces();
 
 
-	/*
+	/**
       createMapMarker(placeData) reads Places information to create map pins.
       placeData is the object returned from search results containing information
       about a single location from fourSquare Api.
-    */
+    **/
 
 	function createMapMarker(placeData) {
 
@@ -90,11 +94,10 @@ var ViewModel = function() {
 		var lat = placeData.location.lat; // latitude from the place service
 		var lon = placeData.location.lng; // longitude from the place service
 		var name = placeData.name; // name of the place from the place service
-		var category = placeData.categories[0].name;
-		var address = placeData.location.address + ',' + placeData.location.city + ',' + placeData.location.country;
-		var contact = placeData.contact.formattedPhone;
-		var rating = placeData.rating;
-		var placeUrl = placeData.url;
+		var address = placeData.location.address + ',' + placeData.location.city + ',' + placeData.location.country; // address for the place
+		var contact = placeData.contact.formattedPhone; //place phone number
+		var rating = placeData.rating; //place rating
+		var placeUrl = placeData.url; //place url for its website 
 
 		// marker is an object with additional data about the pin for a single location
 		var marker = new google.maps.Marker({
@@ -108,7 +111,7 @@ var ViewModel = function() {
 
 		// load streetview
 		var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x110&location=' + address + '';
-		//create new content to style it
+		//create new content 
 		var contentString = '<div class="venueInfowindow">' + '<div class="venueName">' + '<a href ="' + placeUrl + '" target="_blank" >' + name + '</a>' + '<span class="venueRating label-info badge">' + rating + '<sub> /10</sub>' + '</span>' + '</div>' + '<div class="venueContact"><span class="icon-phone"></span>' + contact + '</div>' + '<img class="bgimg" src="' + streetviewUrl + '">' + '</div>';
 
 		// infoWindows are the little helper windows that open when you click
@@ -117,7 +120,6 @@ var ViewModel = function() {
 		var infoWindow = new google.maps.InfoWindow({
 			content: contentString
 		});
-
 
 		google.maps.event.addListener(marker, 'click', function() {
 			infoWindow.open(map, marker);
@@ -128,10 +130,10 @@ var ViewModel = function() {
 
 
 
-	/*
-      pinPoster(Places) takes in the array of Places received from ajax foursquer 
+	/**
+      pinPoster(Places) takes in the array of Places received from foursquer 
       and call createMapMarker for each location
-    */
+    **/
 
 	function pinPoster(Places) {
 		// call createMapMarker for places
@@ -142,7 +144,7 @@ var ViewModel = function() {
 
 
 	/**
-	 When list item clicked call this function
+	 When list item clicked on UI then call this function
 	 Look if name of clicked item is equal to anyone in markers list
 	**/
 	self.focusMarker = function(venue) {
@@ -156,9 +158,10 @@ var ViewModel = function() {
 	}
 
 };
-/*
- initializeMap() 
-*/
+
+/**
+ Initialize google map
+**/
 
 function initializeMap() {
 
