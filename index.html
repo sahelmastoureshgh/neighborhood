@@ -15,16 +15,21 @@
 <body>
 <div style="container-fluid">
 	<div class="row">
-		<div class="col-md-12">
+		<div class="col-md-12 col-xs-12">
 			<div id="map-canvas"></div>
+			<div id="map-error"></div>
 			<form class="form-inline search-bar" role="search">
-			    <div class="form-group">
+				<div class="row">
+			    <div class="form-group col-xs-4 col-m-4">
 			        <input data-bind="value: preferredExplore" type="search" class="form-control" placeholder="Pizza" >
 			    </div>
-			    <div class="form-group">
+			    <div class="form-group col-xs-4 col-m-4">
 			       <input data-bind="value: preferredLoc" type="search" class="form-control"  placeholder="New York, NY">
 			     </div>
-			    <button type="submit" data-bind="click:searchPlaces" class="btn btn-default"><span class="icon-search" aria-hidden="true"></span></button>
+				 <div class="form-group col-xs-4 col-m-4">
+			    <button type="submit" data-bind="click:searchPlaces" class="btn btn-default btn-md"><span class="icon-search" aria-hidden="true"></span></button>
+				 </div>
+			 </div>
 			</form>
 			<div class="list-group venu-group" data-bind="foreach: placeList">
 				<div class="media" data-bind="click: $root.focusMarker">
@@ -45,6 +50,6 @@
     <script src="js/lib/knockout-3.2.0.js"></script>
 	<script src="js/lib/jquery.min.js"></script>
     <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places"></script>
-    <script src="js/app-production.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
