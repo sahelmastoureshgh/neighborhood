@@ -23,6 +23,8 @@ var ViewModel = function() {
 	this.preferredLoc = ko.observable("New York, NY");
 	//prefered type of location
 	this.preferredExplore = ko.observable("pizza");
+	// boolean value for forecast list display
+	self.displayPlaces = ko.observable('true');
 
 	// infoWindows are the little helper windows that open when you click or hover over a pin on a map
 	if (typeof google != "undefined") {
@@ -186,6 +188,13 @@ var ViewModel = function() {
 			createMapMarker(Places[i]);
 		}
 	}
+	/**
+	 * Change the boolean value of displaying places list  
+	 * When user click on collapsible icon
+	 */
+	self.toggleDisplay = function() {
+		self.displayPlaces(!self.displayPlaces());
+	}
 
 	/**
 	 * When list item clicked on UI then call this function
@@ -200,7 +209,9 @@ var ViewModel = function() {
 				MAP.panTo(Markers[i].position);
 			}
 		}
+		self.toggleDisplay();
 	}
+	
 
 };
 
