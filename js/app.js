@@ -23,7 +23,7 @@ var ViewModel = function() {
 	this.preferredLoc = ko.observable("New York, NY");
 	//prefered type of location
 	this.preferredExplore = ko.observable("pizza");
-	// boolean value for forecast list display
+	// boolean value for places list display
 	self.displayPlaces = ko.observable('true');
 
 	// infoWindows are the little helper windows that open when you click or hover over a pin on a map
