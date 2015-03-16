@@ -53,9 +53,9 @@ var ViewModel = function() {
 			var bounds_target = new google.maps.LatLngBounds(
 				new google.maps.LatLng(bounds_suggested.sw.lat, bounds_suggested.sw.lng),
 				new google.maps.LatLng(bounds_suggested.ne.lat, bounds_suggested.ne.lng));
-			MAP.fitBounds(bounds_target);
+			neighborMap.fitBounds(bounds_target);
 			// center the map
-			MAP.setCenter(bounds_target.getCenter());
+			neighborMap.setCenter(bounds_target.getCenter());
 		}
 
 	}
@@ -143,7 +143,7 @@ var ViewModel = function() {
 
 		google.maps.event.addListener(marker, 'click', function() {
 			infoWindow.setContent(contentString);
-			infoWindow.open(MAP, marker);
+			infoWindow.open(neighborMap, marker);
 		});
 	}
 
@@ -161,7 +161,7 @@ var ViewModel = function() {
 		if (typeof google != "undefined") {
 			// marker is an object with additional data about the pin for a single location
 			var marker = new google.maps.Marker({
-				map: MAP,
+				map: neighborMap,
 				position: new google.maps.LatLng(lat, lon),
 				title: name
 			});
@@ -206,10 +206,14 @@ var ViewModel = function() {
 		for (var i = 0; i < Markers.length; i++) {
 			if (Markers[i].title == venueName) {
 				google.maps.event.trigger(Markers[i], 'click');
-				MAP.panTo(Markers[i].position);
+				neighborMap.panTo(Markers[i].position);
 			}
 		}
-		self.toggleDisplay();
+		// call it just for small screen 
+		if($('#display_list').css('display')!="none"){
+		    self.toggleDisplay();
+		}
+		   
 	}
 	
 
@@ -228,8 +232,8 @@ function initializeMap() {
 	};
 
 	try {
-		// This next line makes `MAP` a new Google Map JavaScript Object and attaches it to
-		MAP = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		// This next line makes `neighborMap` a new Google Map JavaScript Object and attaches it to
+		neighborMap = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 		$('#map-canvas').height($(window).height());
 	} catch (err) {
 		//if google map api didnt respond
@@ -241,7 +245,7 @@ function initializeMap() {
 
 
 // declares a global MAP variable
-var MAP;
+var neighborMap;
 
 $(document).ready(function() {
 

@@ -64,11 +64,7 @@
 	overflow: auto;
 }
 #display_list{
-	display:block;
-	position: absolute;
-	top: 50px;
-	z-index: 2;
-	left: 355px;
+	display:none;
 }
 
 @media only screen and (max-width : 760px) {

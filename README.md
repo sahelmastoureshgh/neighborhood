@@ -10,8 +10,9 @@ It utilizes the FourSquare API to get data for locations.
 It utilizes the Google map API to show map.     
 Then you can click each item in the list and see streep view and its phone number.  
 If the place has website then you can find out its website by clicking on name of the place.  
-If you open plus sign then the list of places will be shown, if you click on minus sign then the list of places will be hide,
-Also If you click on places in list the list of places will be hidden.    
+For small screen:  
+  If you open plus sign then the list of places will be shown, if you click on minus sign then the list of places will be hide,
+  Also If you click on places in list the list of places will be hidden.    
 Here is demo http://sahelmastoureshgh.github.io/neighborhood/
 
 
