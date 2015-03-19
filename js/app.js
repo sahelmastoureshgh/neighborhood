@@ -70,57 +70,44 @@ var ViewModel = function() {
 		//create an array to pass places to google map 
 		var allPlaces = [];
 		removeMarkers();
-		var searchItem = true;
-
-		self.filteredPlaces = ko.observableArray(self.placeList());
-
+	
 		// empty out popular list arry for each search
 		self.placeList([]);
 
-		var filterPlace = self.preferredExplore();
+		
+		// near of place for api request
+		var placeNear = '&near=' + self.preferredLoc();
+		// query to find places
+		var query = '&query=' + self.preferredExplore();
 
-		//First Filter through existing list
-		for (var i = 0; i < self.filteredPlaces().length; i++) {
-			if (self.filteredPlaces()[i].name().toLowerCase().indexOf(filterPlace.toLowerCase().trim()) != -1) {
-				self.placeList.push(self.filteredPlaces()[i]);
-				searchItem = false;
+		// load popular places
+		var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102&venuePhotos=1' + placeNear + query;
+
+		//Get json data from four sqaure API 
+		$.getJSON(foursqureUrl, function(data) {
+
+			var places = data.response.groups[0].items;
+			setMapBoundry(data.response.suggestedBounds)
+
+			for (var i = 0; i < places.length; i++) {
+				var item = places[i];
+				// just add those items in list which has picture
+				if (item.venue.photos.groups.length != 0) {
+					self.placeList.push(new PopularPlaces(item));
+					allPlaces.push(item.venue);
+				};
 			}
-		}
-
-		if (searchItem) {
-			// near of place for api request
-			var placeNear = '&near=' + self.preferredLoc();
-			// query to find places
-			var query = '&query=' + self.preferredExplore();
-
-			// load popular places
-			var foursqureUrl = 'https://api.foursquare.com/v2/venues/explore?' + '&client_id=TYMQXOULIRK3I4V0E5BPIDPWYPCFMNDSXMS0C0AY2P5NJOXN' + '&client_secret= R4RUV2LSQVGVBK1SIIUEH2LYQ1FM3QC4QC0NEMVK0B2OCTIA' + '&v=20150102&venuePhotos=1' + placeNear + query;
-
-			//Get json data from four sqaure API 
-			$.getJSON(foursqureUrl, function(data) {
-
-				var places = data.response.groups[0].items;
-				setMapBoundry(data.response.suggestedBounds)
-
-				for (var i = 0; i < places.length; i++) {
-					var item = places[i];
-					// just add those items in list which has picture
-					if (item.venue.photos.groups.length != 0) {
-						self.placeList.push(new PopularPlaces(item));
-						allPlaces.push(item.venue);
-					};
-				}
-				// sort an array based on ranking
-				self.placeList.sort(function(left, right) {
-					return left.rating() == right.rating() ? 0 : (left.rating() > right.rating() ? -1 : 1)
-				});
-				// create marker for all places on map
-				pinPoster(allPlaces);
-			}).error(function(e) {
-				$('.venu-group').html('<h4>There is problem to retrieve data</br>Please try again later</h4>')
-				console.log('error');
+			// sort an array based on ranking
+			self.placeList.sort(function(left, right) {
+				return left.rating() == right.rating() ? 0 : (left.rating() > right.rating() ? -1 : 1)
 			});
-		}
+			// create marker for all places on map
+			pinPoster(allPlaces);
+		}).error(function(e) {
+			$('.venu-group').html('<h4>There is problem to retrieve data</br>Please try again later</h4>')
+			console.log('error');
+		});
+		
 	}
 
 	self.searchPlaces();
@@ -136,6 +123,7 @@ var ViewModel = function() {
 		var contact = placeData.contact.formattedPhone; //place phone number
 		var rating = placeData.rating; //place rating
 		var placeUrl = placeData.url; //place url for its website 
+		var name = placeData.name;
 		//street view
 		var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=200x110&location=' + address + '';
 		//create new content 

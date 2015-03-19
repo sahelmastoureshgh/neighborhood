@@ -123,7 +123,7 @@
 	}
 
 	.venueInfowindow .venueName {
-	    display:none;
+	    font-size: 10px; 
 	}
 	#map-error {
 		height: 100%;
